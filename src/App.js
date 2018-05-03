@@ -3,6 +3,7 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { TabContent, TabPane, Nav, NavItem, NavLink, Row, Col , Container, ListGroup, ListGroupItem } from 'reactstrap';
 import classnames from 'classnames';
+import axios from 'axios';
 
 
 class App extends Component {
@@ -13,7 +14,7 @@ class App extends Component {
         this.toggle = this.toggle.bind(this);
         this.state = {
             activeTab: '1',
-            user: []
+            user: ''
         };
         this.url = 'http://127.0.0.1:8080/user'
     }
@@ -25,28 +26,33 @@ class App extends Component {
         }
     }
     componentDidMount(){
-        fetch(this.url, {
-            mode: 'cors'  })
-            .then(
-                function(response) {
-                    // console.log(response.entries)
-                    if (response.status !== 200) {
-                        console.log('Looks like there was a problem. Status Code: ' +
-                            response.status);
-                    }
-                     return response.json();
-                }
-            ).then(data => this.setState({ user: data }))
-            .catch(function(err) {
+        axios.get(this.url)
+            .then(res => {
+                // console.log( JSON.stringify(res.data));
+                this.setState({ user : res.data});
+            }).catch(function(err) {
                 console.log('Fetch Error :-S', err);
             });
     }
-  render() {
-      // console.log(typeof(this.state.user));
-      this.userList = Object.entries(this.state.user).map((item, index) => {
+    createUserInfo()
+    {
+        // const i = this.state.user.map((item, key) => {
+        //     console.log(item)
+        // })
+        const i = Object.keys(this.state.user).map(key => {
+            return <ListGroupItem>this.state.user[key]</ListGroupItem>
+            }
+        );
+
+        console.log(i);
+     return Object.entries(this.state.user).map((item) => {
+            console.log(item)
               return <ListGroupItem>{item}</ListGroupItem>
           }
       )
+
+    }
+  render() {
     return (
       <div className="App">
         <header className="App-header">
@@ -79,7 +85,7 @@ class App extends Component {
 ]
                                      </div>
                                       <ListGroup>
-                                          { this.userList }
+                                          { this.createUserInfo() }
 
                                       </ListGroup>
                                   </Col>
